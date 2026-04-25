@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Jana! 💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #fffafb;
+            --accent: #e5989b;
+            --text: #6d6875;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--primary); color: var(--text); overflow-x: hidden; }
+
+        /* --- Welcome Screen --- */
+        #welcome-screen {
+            position: fixed; inset: 0; background: radial-gradient(circle, #fffafb 0%, #ffedeb 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1000; transition: 1.2s; cursor: pointer;
+        }
+
+        /* --- Elegant Mini Game --- */
+        #game-container {
+            position: fixed; inset: 0; background: var(--primary);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 900; overflow: hidden;
+        }
+        #game-canvas { width: 100%; height: 100%; cursor: crosshair; }
+        .game-ui { position: absolute; top: 20px; text-align: center; pointer-events: none; }
+        .game-title { font-family: 'Dancing Script', cursive; font-size: 2rem; color: var(--accent); }
+
+        /* --- Main Content --- */
+        .content { padding: 40px 20px; max-width: 1000px; margin: auto; display: none; }
+        section { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: 1.5s; margin-bottom: 100px; }
+        .visible { opacity: 1 !important; }
+
+        #message-section { font-family: 'Dancing Script', cursive; font-size: clamp(1.8rem, 5vw, 2.5rem); text-align: center; color: #b5838d; }
+        .gallery-title { font-family: 'Dancing Script', cursive; font-size: clamp(2.5rem, 6vw, 3.5rem); color: var(--accent); margin-bottom: 40px; }
+
+        /* --- Slideshows --- */
+        .slideshow-container { position: relative; max-width: 450px; width: 90%; height: 500px; border-radius: 15px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 10px solid white; }
+        .mySlides { display: none; width: 100%; height: 100%; }
+        .mySlides img { width: 100%; height: 100%; object-fit: cover; }
+        .fade { animation: fadeEffect 1s; }
+        @keyframes fadeEffect { from {opacity: 0} to {opacity: 1} }
+
+        .popup-frame { position: relative; width: 320px; height: 400px; display: flex; justify-content: center; align-items: center; }
+        .usSlides { position: absolute; display: none; width: 100%; background: white; padding: 15px 15px 50px 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
+        .usSlides img { width: 100%; height: 300px; object-fit: cover; }
+        .pop-in { display: block !important; animation: popAction 0.6s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards; }
+
+        @keyframes popAction {
+            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(var(--rot)); opacity: 1; }
+        }
+
+        .music-btn { position: fixed; bottom: 20px; right: 20px; background: white; border: 1px solid var(--accent); padding: 10px 15px; border-radius: 20px; cursor: pointer; z-index: 1100; }
+        .heart { position: fixed; pointer-events: none; z-index: 99; animation: floatUp 4s linear forwards; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-100vh); opacity: 0; } }
+    </style>
+</head>
+<body onload="initFrontMusic()">
+
+    <div id="welcome-screen" onclick="showGame()">
+        <div style="font-size: 80px;">🎁</div>
+        <h1 style="font-family:'Dancing Script'; color:var(--accent); font-size:3rem; margin-top:15px;">Happy Birthday Jana! 🎂✨</h1>
+        <p style="letter-spacing:2px; font-size:12px; margin-top:10px; color:#b5838d;">TAP TO OPEN YOUR GIFT 💖</p>
+    </div>
+
+    <div id="game-container">
+        <div class="game-ui">
+            <h2 class="game-title">Catch 10 Birthday Wishes! ✨</h2>
+            <p id="score-text" style="color: var(--accent); font-weight: bold;">Score: 0 / 10</p>
+        </div>
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <audio id="song-front" loop><source src="birthday-front.mp3" type="audio/mpeg"></audio>
+    <audio id="song-game" loop><source src="game-playful.mp3" type="audio/mpeg"></audio>
+    <audio id="song-message" loop><source src="message-song.mp3" type="audio/mpeg"></audio>
+    <audio id="song-solo" loop><source src="jana-song.mp3" type="audio/mpeg"></audio>
+    <audio id="song-us" loop><source src="us-song.mp3" type="audio/mpeg"></audio>
+    
+    <audio id="sound-pop"><source src="pop.mp3" type="audio/mpeg"></audio>
+
+    <button class="music-btn" onclick="toggleMute()">🎵 Mute/Unmute</button>
+
+    <div class="content" id="main-content">
+        <section id="message-section" class="visible"><p id="typing-text"></p></section>
+
+        <section id="solo-gallery-section">
+            <h2 class="gallery-title">The Birthday Girl 🌸</h2>
+            <div class="slideshow-container">
+                <div class="mySlides fade"><img src="jana-1.jpg"></div>
+                <div class="mySlides fade"><img src="jana-2.jpg"></div>
+                <div class="mySlides fade"><img src="jana-3.jpg"></div>
+                <div class="mySlides fade"><img src="jana-4.jpg"></div>
+                <div class="mySlides fade"><img src="jana-5.jpg"></div>
+            </div>
+        </section>
+
+        <section id="us-gallery-section">
+            <h2 class="gallery-title">Doodi & Jana 🫂</h2>
+            <div class="popup-frame">
+                <div class="usSlides" style="--rot: -4deg;"><img src="us-1.jpg"></div>
+                <div class="usSlides" style="--rot: 3deg;"><img src="us-2.jpg"></div>
+                <div class="usSlides" style="--rot: -2deg;"><img src="us-3.jpg"></div>
+                <div class="usSlides" style="--rot: 5deg;"><img src="us-4.jpg"></div>
+                <div class="usSlides" style="--rot: -3deg;"><img src="us-5.jpg"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const message = "Happy Birthday, Jana! 🥳🎈 You are such an incredible person and a truly amazing friend. 🌟 I'm so lucky to have you in my life and I cherish all the fun memories we've made together! 💖 I hope your day is as bright and wonderful as you are. Here's to more laughter, more adventures, and an amazing year ahead! 🥂✨🍰";
+        
+        let i = 0, isMuted = false, currentPlaying = null, score = 0;
+        let soloInterval, usInterval, gameActive = false;
+        
+        const songs = { 
+            front: document.getElementById('song-front'), 
+            game: document.getElementById('song-game'),
+            message: document.getElementById('song-message'), 
+            solo: document.getElementById('song-solo'), 
+            us: document.getElementById('song-us') 
+        };
+        const popSound = document.getElementById('sound-pop');
+
+        function initFrontMusic() { playSong('front'); }
+
+        function playSong(key) {
+            if (currentPlaying === songs[key]) return;
+            Object.values(songs).forEach(s => { s.pause(); s.currentTime = 0; });
+            currentPlaying = songs[key];
+            if (!isMuted) currentPlaying.play();
+        }
+
+        /* --- GAME LOGIC --- */
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        let emojis = [];
+        const emojiPool = ['🎂', '✨', '💖', '🎈', '🥳', '🌸'];
+
+        function showGame() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gameActive = true;
+            
+            // Switch to playful game music
+            playSong('game');
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if(!gameActive) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            emojis.forEach((item, index) => {
+                const dist = Math.hypot(item.x - mouseX, item.y - mouseY);
+                if(dist < 45) {
+                    emojis.splice(index, 1);
+                    score++;
+                    
+                    // Play pop sound effect
+                    if(!isMuted) {
+                        popSound.currentTime = 0;
+                        popSound.play();
+                    }
+
+                    document.getElementById('score-text').innerText = `Score: ${score} / 10`;
+                    if(score >= 10) finishGame();
+                }
+            });
+        });
+
+        function gameLoop() {
+            if(!gameActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if(Math.random() < 0.05) {
+                emojis.push({ x: Math.random() * canvas.width, y: -50, speed: 2 + Math.random() * 3, text: emojiPool[Math.floor(Math.random()*emojiPool.length)] });
+            }
+
+            emojis.forEach((item, index) => {
+                item.y += item.speed;
+                ctx.font = '45px serif';
+                ctx.fillText(item.text, item.x, item.y);
+                if(item.y > canvas.height) emojis.splice(index, 1);
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function finishGame() {
+            gameActive = false;
+            document.getElementById('game-container').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('game-container').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                playSong('message'); // Switch to sentimental message song
+                typeWriter();
+                startFloatingIcons();
+            }, 1000);
+        }
+
+        /* --- NAVIGATION & OBSERVER --- */
+        function typeWriter() {
+            if (i < message.length) {
+                document.getElementById("typing-text").innerHTML += message.charAt(i);
+                i++;
+                setTimeout(typeWriter, 55);
+            }
+        }
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    if (entry.target.id === 'message-section') playSong('message');
+                    else if (entry.target.id === 'solo-gallery-section') { playSong('solo'); if (!soloInterval) startSoloSlides(); }
+                    else if (entry.target.id === 'us-gallery-section') { playSong('us'); if (!usInterval) runUsLoop(); }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('section').forEach(s => sectionObserver.observe(s));
+
+        function startSoloSlides() {
+            let slides = document.getElementsByClassName("mySlides");
+            let soloIndex = 0;
+            const nextSlide = () => {
+                for (let j = 0; j < slides.length; j++) slides[j].style.display = "none";
+                soloIndex++; if (soloIndex > slides.length) soloIndex = 1;
+                slides[soloIndex-1].style.display = "block";
+            };
+            nextSlide();
+            soloInterval = setInterval(nextSlide, 3000);
+        }
+
+        function runUsLoop() {
+            let usSlides = document.getElementsByClassName("usSlides"), usIndex = 0;
+            const nextUs = () => {
+                for (let k = 0; k < usSlides.length; k++) { usSlides[k].classList.remove('pop-in'); usSlides[k].style.display = "none"; }
+                usIndex++; if (usIndex > usSlides.length) usIndex = 1;
+                usSlides[usIndex-1].classList.add('pop-in');
+            };
+            nextUs();
+            usInterval = setInterval(nextUs, 3000);
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            if (isMuted) { if (currentPlaying) currentPlaying.pause(); } 
+            else { if (currentPlaying) currentPlaying.play(); }
+        }
+
+        function startFloatingIcons() {
+            setInterval(() => {
+                const item = document.createElement('div');
+                item.classList.add('heart');
+                item.innerHTML = ['🌸', '✨', '💖', '🎂'][Math.floor(Math.random() * 4)];
+                item.style.left = Math.random() * 100 + 'vw';
+                item.style.fontSize = '25px';
+                document.body.appendChild(item);
+                setTimeout(() => item.remove(), 4000);
+            }, 600);
+        }
+    </script>
+</body>
+</html>
